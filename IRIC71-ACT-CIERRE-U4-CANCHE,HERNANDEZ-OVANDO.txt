@@ -1,0 +1,89 @@
+package com.iri.hdfs;
+
+import java.io.File;
+import java.io.IOException;
+
+
+
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
+
+
+import java.util.*;
+
+public class Hdfs {
+	
+	public static String nombreArchivo;
+	public static String contenido = "contenido del archivo";
+	public static String usuario;
+	public static String grupo;
+	public static String permissions;
+	public static String ruta;
+	public static String route;
+	
+
+	public static void main(String[] args) {
+		
+		//Creamos la configuración de acceso al HDFS
+		Configuration conf = new Configuration(true);
+		
+		conf.set("fs.defaultFS", "hdfs://127.0.0.1:7180/");
+		
+		System.setProperty("HADOOP", "hdfs");
+				
+		try {
+			//Crear objeto FileSystem
+			FileSystem fs = FileSystem.get(conf);
+			
+			System.out.println("ESCRIBE EL NOMRBRE");
+	    	Scanner nombrearchivo = new Scanner(System.in);
+	    	nombrearchivo.nextLine();
+	    	nombreArchivo=nombrearchivo.toString();
+	    	System.out.println("ELIJA RUTA");
+	    	Scanner ruta = new Scanner(System.in);
+	    	ruta.nextLine();
+	    	route=ruta.toString();
+			
+			Path rutaArchivo = new Path(route + File.separator + nombreArchivo);
+			FSDataOutputStream outputStream = null;
+			
+			if(!fs.exists(rutaArchivo)) {
+				outputStream = fs.create(rutaArchivo);
+				outputStream.writeBytes(contenido);
+			}
+			
+			System.out.println("ELIJA USUARIO PROPIETARO");
+	    	Scanner user = new Scanner(System.in);
+	    	user.nextLine();
+	    	usuario=user.toString();
+	    	System.out.println("ELIJA GRUPO PROPIETARIO");
+	    	Scanner group = new Scanner(System.in);
+	    	group.nextLine();
+	    	grupo=group.toString();
+			fs.setOwner(rutaArchivo, usuario , grupo);
+			
+			System.out.println("ELIJA PERMISOS");
+	    	Scanner permisos = new Scanner(System.in);
+	    	permisos.nextLine();
+	    	permissions=permisos.toString();
+	    	FsPermission permis = FsPermission.valueOf("-rwxrwxrwx");
+			fs.setPermission(rutaArchivo, permis);
+			
+			fs.delete(new Path(route), true);
+			fs.close();
+			
+		}catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+}
+
+//CANCHE CANO ANGEL MARTIN
+//HERNANDEZ VARGAS VICTOR
+//OVANDO HERNANDEZ LUIS AXEL
